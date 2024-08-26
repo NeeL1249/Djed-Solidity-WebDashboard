@@ -14,7 +14,7 @@ import {
   web3Promise,
   percentageScale
 } from "./helpers";
-import { TRANSACTION_USD_LIMIT, TRANSACTION_VALIDITY, BC_TOKEN_DECIMALS, HIGH_PRECISION_DECIMALS, REFRESH_PERIOD_MS } from "./constants";
+import { TRANSACTION_USD_LIMIT, TRANSACTION_VALIDITY, HIGH_PRECISION_DECIMALS, REFRESH_PERIOD_MS } from "./constants";
 import { BigNumber } from "ethers";
 
 const BLOCKCHAIN_URI = process.env.REACT_APP_BLOCKCHAIN_URI;
@@ -22,7 +22,6 @@ export const DJED_ADDRESS = process.env.REACT_APP_DJED_ADDRESS;
 const FEE_UI = process.env.REACT_APP_FEE_UI;
 export const UI = process.env.REACT_APP_UI;
 
-export const BC_DECIMALS = BC_TOKEN_DECIMALS;
 export const SCALING_DECIMALS = HIGH_PRECISION_DECIMALS; // scalingFixed // TODO: why do we need this?
 
 const REFRESH_PERIOD = REFRESH_PERIOD_MS;
@@ -46,6 +45,21 @@ export const getWeb3 = () =>
 export const getDjedContract = (web3) => {
   const djed = new web3.eth.Contract(djedArtifact.abi, DJED_ADDRESS);
   return djed;
+};
+
+export const getBcDecimals = async () => {
+  try{
+    const web3 = await getWeb3();
+    const contract = getDjedContract(web3);
+    return BC_DECIMALS = convertInt(await contract.methods.decimals().call());
+  } catch(error) {
+    console.log("error: ", error);
+    return 18;
+  }
+};
+
+export const BC_DECIMALS = async () => {
+  return getBcDecimals();
 };
 
 export const getOracleAddress = async (djedContract) => {
